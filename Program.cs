@@ -40,8 +40,6 @@ var bingSearch = new BingConnector(bingSearchAPIKey);
 var webSearchPlugin = new WebSearchEnginePlugin(bingSearch);
 kernelBuilder.Plugins.AddFromObject(webSearchPlugin);
 var kernel = kernelBuilder.Build();
-
-var kernelMessageConnector = new SemanticKernelChatMessageContentConnector();
 var cmo = new SemanticKernelAgent(
        kernel: kernel,
        name: "cmo",
