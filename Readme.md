@@ -32,3 +32,6 @@ In the example below, two questions are raised from user
 In the chat session, the CEO forwards the first question to CMO because it is related to marketing, who then uses Bing search to find the answer. The CEO answers the second question because it is related to the company-wide operation.
 
 ![AI Agent team chat session](./asset/team-chat.gif)
+
+## Further reading
+- [AutoGen.Net](https://microsoft.github.io/autogen-for-net/)
