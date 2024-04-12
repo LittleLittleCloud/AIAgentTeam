@@ -18,3 +18,6 @@ var gpt3_5 = "gpt-3.5-turbo";
 var gpt_4 = "gpt-4-turbo";
 var openaiClient = new OpenAIClient(openaiAPI);
 var seed = 1;
+
+// Step 1: Create the user
+var user = new UserProxyAgent(name: "user");
