@@ -18,7 +18,11 @@ var gpt3_5 = "gpt-3.5-turbo";
 var gpt_4 = "gpt-4-turbo";
 var openaiClient = new OpenAIClient(openaiAPI);
 var seed = 1;
-// Create the CEO
+
+// Step 1: Create the user
+var user = new UserProxyAgent(name: "user");
+
+// Step 2: Create the CEO
 var ceo = new OpenAIChatAgent(
     openAIClient: openaiClient,
     name: "Elon Musk",
@@ -34,7 +38,7 @@ var ceo = new OpenAIChatAgent(
     .RegisterMessageConnector()
     .RegisterPrintFormatMessageHook();
 
-// Create the cmo
+// Step 3: Create the CMO
 var kernelBuilder = Kernel.CreateBuilder()
     .AddOpenAIChatCompletion(modelId: gpt3_5, openAIClient: openaiClient);
 var bingSearch = new BingConnector(bingSearchAPIKey);
@@ -52,19 +56,7 @@ var cmo = new SemanticKernelAgent(
     .RegisterMessageConnector()
     .RegisterPrintFormatMessageHook();
 
-// Create the hearing member
-var user = new UserProxyAgent(name: "user");
-
-// Create the group admin
-var admin = new OpenAIChatAgent(
-    openAIClient: openaiClient,
-    name: "admin",
-    modelName: gpt_4,
-    seed: seed,
-    systemMessage: "You are the group admin.")
-    .RegisterMessageConnector();
-
-// Create the AI team
+// Step 4: Create the workflow
 // define the transition among group members
 // we only allow the following transitions:
 // user -> ceo
@@ -77,16 +69,28 @@ var ceo2Cmo = Transition.Create(ceo, cmo);
 var cmo2Ceo = Transition.Create(cmo, ceo);
 var ceo2User = Transition.Create(ceo, user);
 
-var graph = new Graph([user2Ceo, ceo2Cmo, cmo2Ceo, ceo2User]);
+var workflow = new Graph([user2Ceo, ceo2Cmo, cmo2Ceo, ceo2User]);
+
+// Step 5: Create the group admin and the group chat
+var admin = new OpenAIChatAgent(
+    openAIClient: openaiClient,
+    name: "admin",
+    modelName: gpt_4,
+    seed: seed,
+    systemMessage: "You are the group admin.")
+    .RegisterMessageConnector();
+
 var aiTeam = new GroupChat(
     members: [user, ceo, cmo],
     admin: admin,
-    workflow: graph);
+    workflow: workflow);
 
-// start the chat
-// generate a greeting message to hearing member from ceo
+// Step 6: Start the chat
+// generate a greeting message to attenders from ceo
 var greetingMessage = await ceo.SendAsync("You are in the QA session, generate a greeting message to the attenders");
+// ask for a question from user
 var userQuestion = await user.SendAsync("create a question to ask the CEO");
+// start the chat
 await ceo.SendMessageToGroupAsync(
     groupChat: aiTeam,
     chatHistory: [greetingMessage, userQuestion],
