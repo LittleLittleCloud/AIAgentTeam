@@ -17,25 +17,26 @@ var bingSearchAPIKey = Environment.GetEnvironmentVariable("BING_API_KEY") ?? thr
 var gpt3_5 = "gpt-3.5-turbo";
 var gpt_4 = "gpt-4-turbo";
 var openaiClient = new OpenAIClient(openaiAPI);
-
+var seed = 1;
 // Create the CEO
 var ceo = new OpenAIChatAgent(
     openAIClient: openaiClient,
     name: "Elon Musk",
-    modelName: gpt3_5,
+    modelName: gpt_4,
+    seed: seed,
     systemMessage: """
-    You are Elon Musk, CEO of Tesla. You are in a hearing about Tesla.
-    When a question about tesla is asked, You can ask your subordinates to answer the question.
+    You are Elon Musk, CEO of Tesla. You are in a QA about Tesla.
+    When a question about tesla is asked, You can forward the question to your subordinates if the question is related to marketing.
 
     Here are your subordinates:
-    - cmo: Chief Marketing Officer who is responsible for answering all market-related questions.
+    - CMO: Chief Marketing Officer who is responsible for answering all market-related questions.
     """)
     .RegisterMessageConnector()
     .RegisterPrintFormatMessageHook();
 
 // Create the cmo
 var kernelBuilder = Kernel.CreateBuilder()
-    .AddOpenAIChatCompletion(modelId: gpt3_5, apiKey: openaiAPI);
+    .AddOpenAIChatCompletion(modelId: gpt3_5, openAIClient: openaiClient);
 var bingSearch = new BingConnector(bingSearchAPIKey);
 var webSearchPlugin = new WebSearchEnginePlugin(bingSearch);
 kernelBuilder.Plugins.AddFromObject(webSearchPlugin);
@@ -52,30 +53,31 @@ var cmo = new SemanticKernelAgent(
     .RegisterPrintFormatMessageHook();
 
 // Create the hearing member
-var user = new UserProxyAgent(name: "hearingMember");
+var user = new UserProxyAgent(name: "user");
 
 // Create the group admin
 var admin = new OpenAIChatAgent(
     openAIClient: openaiClient,
     name: "admin",
     modelName: gpt_4,
+    seed: seed,
     systemMessage: "You are the group admin.")
     .RegisterMessageConnector();
 
 // Create the AI team
 // define the transition among group members
 // we only allow the following transitions:
-// hearingMember -> ceo
+// user -> ceo
 // ceo -> cmo
 // cmo -> ceo
-// ceo -> hearingMember
+// ceo -> user
 
-var hearingMember2Ceo = Transition.Create(user, ceo);
-var ceo2Ds = Transition.Create(ceo, cmo);
-var ds2Ceo = Transition.Create(cmo, ceo);
-var ceo2HearingMember = Transition.Create(ceo, user);
+var user2Ceo = Transition.Create(user, ceo);
+var ceo2Cmo = Transition.Create(ceo, cmo);
+var cmo2Ceo = Transition.Create(cmo, ceo);
+var ceo2User = Transition.Create(ceo, user);
 
-var graph = new Graph([hearingMember2Ceo, ceo2Ds, ds2Ceo, ceo2HearingMember]);
+var graph = new Graph([user2Ceo, ceo2Cmo, cmo2Ceo, ceo2User]);
 var aiTeam = new GroupChat(
     members: [user, ceo, cmo],
     admin: admin,
@@ -83,8 +85,9 @@ var aiTeam = new GroupChat(
 
 // start the chat
 // generate a greeting message to hearing member from ceo
-var greetingMessage = await ceo.SendAsync("generate a greeting message to hearing memeber");
+var greetingMessage = await ceo.SendAsync("You are in the QA session, generate a greeting message to the attenders");
+var userQuestion = await user.SendAsync("create a question to ask the CEO");
 await ceo.SendMessageToGroupAsync(
     groupChat: aiTeam,
-    chatHistory: [greetingMessage],
+    chatHistory: [greetingMessage, userQuestion],
     maxRound: 20);
