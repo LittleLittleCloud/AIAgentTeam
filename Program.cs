@@ -61,15 +61,15 @@ var cmo = new SemanticKernelAgent(
 // we only allow the following transitions:
 // user -> ceo
 // ceo -> cmo
-// cmo -> ceo
+// cmo -> user
 // ceo -> user
 
 var user2Ceo = Transition.Create(user, ceo);
 var ceo2Cmo = Transition.Create(ceo, cmo);
-var cmo2Ceo = Transition.Create(cmo, ceo);
+var cmo2User = Transition.Create(cmo, user);
 var ceo2User = Transition.Create(ceo, user);
 
-var workflow = new Graph([user2Ceo, ceo2Cmo, cmo2Ceo, ceo2User]);
+var workflow = new Graph([user2Ceo, ceo2Cmo, cmo2User, ceo2User]);
 
 // Step 5: Create the group admin and the group chat
 var admin = new OpenAIChatAgent(
