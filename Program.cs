@@ -1,6 +1,6 @@
 ﻿// create AI team
 // suppress SKEXP0005
-#pragma warning disable SKEXP0054
+#pragma warning disable
 
 using AIAgentTeam;
 using AutoGen;
@@ -22,7 +22,7 @@ var openaiClient = new OpenAIClient(openaiAPI);
 var ceo = new OpenAIChatAgent(
     openAIClient: openaiClient,
     name: "Elon Musk",
-    modelName: gpt_4,
+    modelName: gpt3_5,
     systemMessage: """
     You are Elon Musk, CEO of Tesla. You are in a hearing about Tesla.
     When a question about tesla is asked, You can ask your subordinates to answer the question.
@@ -42,9 +42,9 @@ kernelBuilder.Plugins.AddFromObject(webSearchPlugin);
 var kernel = kernelBuilder.Build();
 var cmo = new SemanticKernelAgent(
        kernel: kernel,
-       name: "cmo",
+       name: "CMO",
        systemMessage: """
-       You are cmo, you report to Elon and you answer all market-related question.
+       You are CMO, you report to Elon and you answer all market-related question.
 
        To make sure you have the most up-to-date information, you can use the web search plugin to search for information on the web before answering questions.
        """)
@@ -52,7 +52,7 @@ var cmo = new SemanticKernelAgent(
     .RegisterPrintFormatMessageHook();
 
 // Create the hearing member
-var hearingMember = new UserProxyAgent(name: "hearingMember");
+var user = new UserProxyAgent(name: "hearingMember");
 
 // Create the group admin
 var admin = new OpenAIChatAgent(
@@ -70,14 +70,14 @@ var admin = new OpenAIChatAgent(
 // cmo -> ceo
 // ceo -> hearingMember
 
-var hearingMember2Ceo = Transition.Create(hearingMember, ceo);
+var hearingMember2Ceo = Transition.Create(user, ceo);
 var ceo2Ds = Transition.Create(ceo, cmo);
 var ds2Ceo = Transition.Create(cmo, ceo);
-var ceo2HearingMember = Transition.Create(ceo, hearingMember);
+var ceo2HearingMember = Transition.Create(ceo, user);
 
 var graph = new Graph([hearingMember2Ceo, ceo2Ds, ds2Ceo, ceo2HearingMember]);
 var aiTeam = new GroupChat(
-    members: [hearingMember, ceo, cmo],
+    members: [user, ceo, cmo],
     admin: admin,
     workflow: graph);
 
