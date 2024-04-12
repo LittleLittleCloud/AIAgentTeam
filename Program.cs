@@ -21,3 +21,19 @@ var seed = 1;
 
 // Step 1: Create the user
 var user = new UserProxyAgent(name: "user");
+
+// Step 2: Create the CEO
+var ceo = new OpenAIChatAgent(
+    openAIClient: openaiClient,
+    name: "Elon Musk",
+    modelName: gpt_4,
+    seed: seed,
+    systemMessage: """
+    You are Elon Musk, CEO of Tesla. You are in a QA about Tesla.
+    When a question about tesla is asked, You can forward the question to your subordinates if the question is related to marketing.
+
+    Here are your subordinates:
+    - CMO: Chief Marketing Officer who is responsible for answering all market-related questions.
+    """)
+    .RegisterMessageConnector()
+    .RegisterPrintFormatMessageHook();
