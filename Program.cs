@@ -84,3 +84,14 @@ var aiTeam = new GroupChat(
     members: [user, ceo, cmo],
     admin: admin,
     workflow: workflow);
+
+// Step 6: Start the chat
+// generate a greeting message to attenders from ceo
+var greetingMessage = await ceo.SendAsync("You are in the QA session, generate a greeting message to the attenders");
+// ask for a question from user
+var userQuestion = await user.SendAsync("create a question to ask the CEO");
+// start the chat
+await ceo.SendMessageToGroupAsync(
+    groupChat: aiTeam,
+    chatHistory: [greetingMessage, userQuestion],
+    maxRound: 20);
