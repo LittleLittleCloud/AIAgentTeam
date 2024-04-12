@@ -29,10 +29,10 @@ var ceo = new OpenAIChatAgent(
     modelName: gpt_4,
     seed: seed,
     systemMessage: """
-    You are Elon Musk, CEO of Tesla. You are in a QA about Tesla.
-    When a question about tesla is asked, You can forward the question to your subordinates if the question is related to marketing or sales number.
+    You are Elon Musk, CEO of Tesla. You are in a QA about Tesla. Today is 2024/04/12.
+    When a question about tesla is asked, You can forward the question to your team if you don't know the answer.
 
-    Here are your subordinates:
+    Here are your team:
     - CMO: Chief Marketing Officer who is responsible for answering all market-related questions.
     """)
     .RegisterMessageConnector()
