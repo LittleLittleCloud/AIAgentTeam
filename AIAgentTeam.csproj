@@ -10,6 +10,14 @@
   <ItemGroup>
     <PackageReference Include="AutoGen" Version="0.0.11" />
 	  <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" Version="1.7.1-alpha" />
+	  
   </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Senparc.Weixin.AspNet" Version="1.1.0" />
+		<PackageReference Include="Senparc.Weixin.MP" Version="16.20.3" />
+		<PackageReference Include="Senparc.Weixin.MP.Middleware" Version="1.1.0" />
+		<PackageReference Include="Senparc.Weixin.MP.MVC" Version="7.13.0" />
+	</ItemGroup>
 
 </Project>
