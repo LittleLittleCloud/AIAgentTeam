@@ -70,3 +70,17 @@ var cmo2Ceo = Transition.Create(cmo, ceo);
 var ceo2User = Transition.Create(ceo, user);
 
 var workflow = new Graph([user2Ceo, ceo2Cmo, cmo2Ceo, ceo2User]);
+
+// Step 5: Create the group admin and the group chat
+var admin = new OpenAIChatAgent(
+    openAIClient: openaiClient,
+    name: "admin",
+    modelName: gpt_4,
+    seed: seed,
+    systemMessage: "You are the group admin.")
+    .RegisterMessageConnector();
+
+var aiTeam = new GroupChat(
+    members: [user, ceo, cmo],
+    admin: admin,
+    workflow: workflow);
