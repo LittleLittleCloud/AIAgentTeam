@@ -15,7 +15,7 @@ using Microsoft.SemanticKernel.Plugins.Web.Bing;
 var openaiAPI = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new Exception("OPENAI_API_KEY is not set");
 var bingSearchAPIKey = Environment.GetEnvironmentVariable("BING_API_KEY") ?? throw new Exception("BING_API_KEY is not set");
 var gpt3_5 = "gpt-3.5-turbo";
-var gpt_4 = "gpt-4-turbo";
+var gpt_4 = "gpt-4";
 var openaiClient = new OpenAIClient(openaiAPI);
 var seed = 1;
 
@@ -30,7 +30,7 @@ var ceo = new OpenAIChatAgent(
     seed: seed,
     systemMessage: """
     You are Elon Musk, CEO of Tesla. You are in a QA about Tesla.
-    When a question about tesla is asked, You can forward the question to your subordinates if the question is related to marketing.
+    When a question about tesla is asked, You can forward the question to your subordinates if the question is related to marketing or sales number.
 
     Here are your subordinates:
     - CMO: Chief Marketing Officer who is responsible for answering all market-related questions.
@@ -77,6 +77,7 @@ var admin = new OpenAIChatAgent(
     name: "admin",
     modelName: gpt_4,
     seed: seed,
+    temperature: 0,
     systemMessage: "You are the group admin.")
     .RegisterMessageConnector();
 
